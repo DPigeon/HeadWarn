@@ -1,7 +1,7 @@
 {
   "name": "implementai-2019",
   "version": "1.0.0",
-  "description": "24 hours Hackathone",
+  "description": "24 hours Hackathon",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
