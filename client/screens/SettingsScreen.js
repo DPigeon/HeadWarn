@@ -1,5 +1,5 @@
-import React from 'react';
-import { ExpoConfigView } from '@expo/samples';
+import React from "react";
+import { ExpoConfigView } from "@expo/samples";
 import DisplayAnImage from "./DisplayAnImage";
 
 export default function SettingsScreen() {
@@ -11,5 +11,5 @@ export default function SettingsScreen() {
 }
 
 SettingsScreen.navigationOptions = {
-  title: 'app.json',
+  header: null
 };
