@@ -3,6 +3,9 @@ import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 
+
+const serverURL = "http://feb5887e.ngrok.io/upload";
+
 export default class CameraExample extends React.Component {
     state = {
         hasCameraPermission: null,
@@ -23,7 +26,35 @@ export default class CameraExample extends React.Component {
         {
             let photo = await this.camera.takePictureAsync();
             this.setState({ isCapturing: false, accessCameraLabel: 'Retake', capturedPhoto: photo.uri});
-            console.log(photo.uri);
+
+            let reader = new FileReader();
+            reader.onloadend = () => {
+                this.setState({
+                    capturedPhoto: this.state.capturedPhoto
+                });
+            };
+
+            reader.readAsDataURL(photo.uri);
+            // Config file to send to back end.
+            const data = new FormData();
+            data.append('file', {
+                uri: this.state.capturedPhoto,
+            });
+            data.append('base', {
+                uri: photo.uri,
+            });
+            const config = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: data
+            };
+
+            fetch(serverURL, config).then((response) => {
+                console.log(JSON.stringify(data));
+                console.log(photo);
+            }).catch((err) => {console.log(err)}) ;
         }
         else
         {
@@ -90,14 +121,10 @@ export default class CameraExample extends React.Component {
         } else if (hasCameraPermission === false) {
             return <Text>No access to camera</Text>;
         } else if (this.state.capturedPhoto) {
-            return (this.renderImage());
+            return (this.renderImage()); // test
         } else {
             return (this.renderCamera());
         }
     }
 }
-
-const styles = StyleSheet.create({
-
-});
 
