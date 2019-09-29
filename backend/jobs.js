@@ -73,11 +73,11 @@ function analyzer(joints) {
   let rightEye = [joints[16], joints[17]];
   let rightEar = [joints[18], joints[19]];
 
-    if (leftEye[1] < readJSON(1)) { 
+    if (leftEye[1] <= readJSON(1)) { 
         overwriteJSON(joints);
         return response(0);
     }  
-    else if (leftEye[1] >= readJSON(1)) {
+    else if (rightEye[1] <= readJSON(1)) {
        overwriteJSON(joints);
       return response(1);
   }
