@@ -25,14 +25,15 @@ app.use(express.static('public'));
 app.get("/tired", (req, res, next) => {
   //res.send("hello");
   process(function(tired){
-    console.log("response is here man ", tired);
-    res.send({"tired": tired});
+    //console.log("response is here man ", tired);
+    var answer = { "tired": tired };
+    res.send(JSON.stringify(answer));
     next();
   });
 });
 
 app.post('/image', (req, res) => {
-  console.log(req.body.base64);
+  //console.log(req.body.base64);
   decode_base64(req.body.base64, "person.jpg");
   //decode_base64(database64[0], "picture1.jpg");
   console.log("FINISH");

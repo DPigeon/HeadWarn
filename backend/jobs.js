@@ -3,7 +3,7 @@ var request = require("request");
 const { readJSON, overwriteJSON } = require("./config/compare");
 let PICTURE = "person.jpg"
 let file = fs.createReadStream(`${PICTURE}`);
-let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzU5MTIwLCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3NTE5MjAsImp0aSI6ImZlOTQyMmQ2ZmQyMzk4YjM2ZjkxODg4OWQyYzQ1YjVkNTE3MDRjMzI1YTk4ZTg3OGI4MGExZjEwMmNhZmVkMzMiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.zRE5gZO2n3bLlFD7hsASOlAty3rb972FjgG99QzjVQQ'
+let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzkyMzYyLCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3ODUxNjIsImp0aSI6ImRmOTk4MzExZTUzYTE4NjBhZGUwYWE3YzYxYzM1NjRiN2RhZDQ2MzQ0MDkxMTJhMTllMzgzZTM2ZjhhMmRkNDUiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.TXzm3MTSLyd43haX9sQ3cSHNQ8-mnKsleMxUxh5PqtU'
 
 var jobRequest = {
   method: "POST",
@@ -34,9 +34,13 @@ function getJob(jobID, callback) {
     request(jobResponse, function (error, response, body) {
         if (error) throw new Error(error);
         let jsonBody = JSON.parse(body);
+        console.log("This is the joints: ", jsonBody.frames[0]);
         /****************** We will edit the joints ********/
-        let joints = jsonBody.frames[0].persons[0].pose2d.joints;
-        console.log("This is the joints: ",joints);
+        let joints = jsonBody.frames[0].persons;
+        if (joints !== undefined){
+             joints = jsonBody.frames[0].persons[0].pose2d.joints;
+        }
+        console.log(">>>>>>>>>WHYYYYYY>>>>>>>: ",joints);
         if(joints.length < 20){
             callback(response(0));
         }else{
@@ -56,7 +60,8 @@ function cleanArray(joints){
     console.log("Final values: ", finalJoints);
     /***************Main Logic*********************************/
     let data = analyzer(finalJoints)
-    console.log("analyzer", )
+    //console.log("analyzer", )
+
     return data;
     /***************Main Logic*********************************/
 }
@@ -88,10 +93,10 @@ function response(id) {
     let AWAKE = 1;
 
     if (id === TIRED) {
-        console.log("Tired");
+        console.log("Status: Tired");
         return TIRED;
     } else {
-        console.log("Awakes");
+        console.log("Status: Awake");
         return AWAKE;
     }
     //overwriteJSON();
@@ -107,10 +112,10 @@ function process(callback){
         console.log('ZZZzzZzzzzZZZZz for 2 seconds');
         setTimeout(function () {
             getJob(jsonBody.job_id, function (answer) {
-                console.log("Callbackhell answer:", answer);
+                //console.log("Callbackhell answer:", answer);
                 callback(answer);
             });
-        }, 2000);
+        }, 5000);
     });
 }
 
