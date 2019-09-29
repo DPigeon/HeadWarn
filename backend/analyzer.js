@@ -33,7 +33,8 @@ function analyze(joints) {
   let rightEye = [joints[16], joints[17]];
   let rightEar = [joints[18], joints[19]];
 
-  if (topMounth[0] < comparePics) return "You are tired";
+  if (leftEye[1] < comparePics && rightEye[1] < comparePics) return 0; // Tired
+  if (leftEye[1] >= comparePics && rightEye[1] >= comparePics) return 1; // Awake, fine
 }
 
 module.exports = { analyze };
