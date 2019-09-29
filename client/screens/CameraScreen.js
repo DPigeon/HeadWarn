@@ -1,7 +1,13 @@
 import React from 'react';
 import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import * as Permissions from 'expo-permissions';
-import { Camera } from 'expo-camera';
+import {Camera, PictureOptions} from 'expo-camera';
+import * as ImageManipulator from 'expo-image-manipulator';
+
+
+const serverURL = "http://30542968.ngrok.io/image";
+// const serverURL = "http://b1973554.ngrok.io/image";
+
 
 export default class CameraExample extends React.Component {
     state = {
@@ -9,7 +15,8 @@ export default class CameraExample extends React.Component {
         type: Camera.Constants.Type.back,
         isCapturing: false,
         accessCameraLabel: 'Start',
-        capturedPhoto: null
+        capturedPhoto: null,
+        base64: null
     };
 
     async componentDidMount() {
@@ -21,9 +28,31 @@ export default class CameraExample extends React.Component {
     {
         if (this.state.isCapturing)
         {
-            let photo = await this.camera.takePictureAsync();
+
+            const options = {
+                quality: 0.2,
+                base64: true,
+            };
+
+            let photo = await this.camera.takePictureAsync(options);
             this.setState({ isCapturing: false, accessCameraLabel: 'Retake', capturedPhoto: photo.uri});
-            console.log(photo.uri);
+
+            const data = new FormData();
+            data.append('base64', photo.base64);
+            const config = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: data
+            };
+
+            console.log(data);
+
+            fetch(serverURL, config).then((response) => {
+                console.log(photo);
+                console.log(response);
+            }).catch((err) => {console.log(err)}) ;
         }
         else
         {
@@ -90,14 +119,10 @@ export default class CameraExample extends React.Component {
         } else if (hasCameraPermission === false) {
             return <Text>No access to camera</Text>;
         } else if (this.state.capturedPhoto) {
-            return (this.renderImage());
+            return (this.renderImage()); // test
         } else {
             return (this.renderCamera());
         }
     }
 }
-
-const styles = StyleSheet.create({
-
-});
 

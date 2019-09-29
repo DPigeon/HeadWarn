@@ -1,6 +1,5 @@
 import React from 'react';
-import { AppRegistry, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Camera } from 'expo';
+import {StyleSheet} from 'react-native';
 import CameraExample from "./CameraScreen";
 
 export default function LinksScreen() {
@@ -35,11 +34,3 @@ const styles = StyleSheet.create({
   },
 });
 
-
-takePicture = async() => {
-  if (this.camera) {
-    const options = { quality: 0.5, base64: true };
-    const data = await this.camera.takePictureAsync(options);
-    console.log(data.uri);
-  }
-};
