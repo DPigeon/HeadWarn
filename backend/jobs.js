@@ -39,7 +39,6 @@ function getJob(jobID) {
     let joints = jsonBody.frames[0].persons[0].pose2d.joints;
     console.log("This is the joints: ", joints);
     cleanArray(joints);
-    //readJSON(1);
   });
 }
 

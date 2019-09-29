@@ -1,21 +1,26 @@
 const fs = require("fs");
+const util = require("util");
 let comparePics = 0; // for now, later we will use parameters from pictures (10)
 
-function readJSON(index) {
+const readfile = util.promisify(fs.readFile);
+
+async function readJSON(index) {
   let file;
-  fs.readFile("./config/data.json", "utf8", (error, jsonString) => {
+  let response = readfile("./config/data.json", "utf8", (error, jsonString) => {
     if (error) {
       console.log("Failed to read the file.", error);
       return;
     }
     try {
       file = JSON.parse(jsonString);
-      console.log(file);
+      //console.log(file);
+      return file[index];
     } catch (error) {
       console.log("Gotta work on your stuff man, error:", error);
     }
   });
-  return file;
+
+  return await response;
 }
 
 function overwriteJSON(payload) {
