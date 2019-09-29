@@ -1,10 +1,13 @@
 import React from 'react';
 import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import * as Permissions from 'expo-permissions';
-import { Camera } from 'expo-camera';
+import {Camera, PictureOptions} from 'expo-camera';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 
-const serverURL = "http://feb5887e.ngrok.io/upload";
+const serverURL = "http://30542968.ngrok.io/image";
+// const serverURL = "http://b1973554.ngrok.io/image";
+
 
 export default class CameraExample extends React.Component {
     state = {
@@ -12,7 +15,8 @@ export default class CameraExample extends React.Component {
         type: Camera.Constants.Type.back,
         isCapturing: false,
         accessCameraLabel: 'Start',
-        capturedPhoto: null
+        capturedPhoto: null,
+        base64: null
     };
 
     async componentDidMount() {
@@ -24,25 +28,17 @@ export default class CameraExample extends React.Component {
     {
         if (this.state.isCapturing)
         {
-            let photo = await this.camera.takePictureAsync();
-            this.setState({ isCapturing: false, accessCameraLabel: 'Retake', capturedPhoto: photo.uri});
 
-            let reader = new FileReader();
-            reader.onloadend = () => {
-                this.setState({
-                    capturedPhoto: this.state.capturedPhoto
-                });
+            const options = {
+                quality: 0.2,
+                base64: true,
             };
 
-            reader.readAsDataURL(photo.uri);
-            // Config file to send to back end.
+            let photo = await this.camera.takePictureAsync(options);
+            this.setState({ isCapturing: false, accessCameraLabel: 'Retake', capturedPhoto: photo.uri});
+
             const data = new FormData();
-            data.append('file', {
-                uri: this.state.capturedPhoto,
-            });
-            data.append('base', {
-                uri: photo.uri,
-            });
+            data.append('base64', photo.base64);
             const config = {
                 method: 'POST',
                 headers: {
@@ -51,9 +47,11 @@ export default class CameraExample extends React.Component {
                 body: data
             };
 
+            console.log(data);
+
             fetch(serverURL, config).then((response) => {
-                console.log(JSON.stringify(data));
                 console.log(photo);
+                console.log(response);
             }).catch((err) => {console.log(err)}) ;
         }
         else
