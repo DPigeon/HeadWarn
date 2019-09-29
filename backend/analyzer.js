@@ -1,3 +1,5 @@
+const { comparePics } = require("./config/compare");
+
 /*
  * Analyzer for the face recognition
  */
@@ -12,20 +14,26 @@ function analyze(joints) {
   for (var i = 0; i < joints.length; i++) {
     for (var j = 0; j < joints.length; j++) {
       if (j % 2 === 0) x[i] = joints[j];
-      else y[i] = joints[j];
+      else y[i] = -joints[j]; // Flipping y values
     }
-  }
-
-  /*
-   * Flip y values
-   */
-  for (var i = 0; i < joints.length; i++) {
-    y[i] = -y[i];
   }
 
   /*
    * Map indices into the right face part
    */
+  // Coordinates
+  let topMouth = [joints[0], joints[1]];
+  let chin = [joints[2], joints[3]];
+  let middleOfEyes = [joints[4], joints[5]];
+  let leftShoulder = [joints[6], joints[7]];
+  let rightShoulder = [joints[8], joints[9]];
+  let nose = [joints[10], joints[11]];
+  let leftEye = [joints[12], joints[13]];
+  let leftEar = [joints[14], joints[15]];
+  let rightEye = [joints[16], joints[17]];
+  let rightEar = [joints[18], joints[19]];
+
+  if (topMounth[0] < comparePics) return "You are tired";
 }
 
 module.exports = { analyze };
