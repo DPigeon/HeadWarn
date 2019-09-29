@@ -1,9 +1,9 @@
 var fs = require("fs");
 var request = require("request");
 const { readJSON, overwriteJSON } = require("./config/compare");
-let PICTURE = "person.png"
+let PICTURE = "person.jpg"
 let file = fs.createReadStream(`${PICTURE}`);
-let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzQ1Mjc0LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MzgwNzQsImp0aSI6ImI5NGY2NmFlNmVjOWNhYjQ3MDg2YmNjNTAxZjA5OWM5NzI5NTRiN2I2M2Y5YWI3NDM0MjU3Y2E0ZTFhOTQ3M2IiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.oKSGwn0-PS4E1d487L8B76y8anx0LfSgMrDD6pbeFo0'
+let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzU5MTIwLCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3NTE5MjAsImp0aSI6ImZlOTQyMmQ2ZmQyMzk4YjM2ZjkxODg4OWQyYzQ1YjVkNTE3MDRjMzI1YTk4ZTg3OGI4MGExZjEwMmNhZmVkMzMiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.zRE5gZO2n3bLlFD7hsASOlAty3rb972FjgG99QzjVQQ'
 
 var jobRequest = {
   method: "POST",
@@ -73,11 +73,11 @@ function analyzer(joints) {
   let rightEye = [joints[16], joints[17]];
   let rightEar = [joints[18], joints[19]];
 
-    if (leftEye[1] <= readJSON(1)) { 
+    if (leftEye[1] < readJSON(1)) { 
         overwriteJSON(joints);
         return response(0);
     }  
-    else if (rightEye[1] <= readJSON(1)) {
+    else if (rightEye[1] >= readJSON(1)) {
        overwriteJSON(joints);
       return response(1);
   }
@@ -104,13 +104,13 @@ function process(callback){
         if (error) throw new Error(error);
         let jsonBody = JSON.parse(body);
         console.log("Job Id", jsonBody.job_id);
-        console.log('ZZZzzZzzzzZZZZz for 5 seconds');
+        console.log('ZZZzzZzzzzZZZZz for 2 seconds');
         setTimeout(function () {
             getJob(jsonBody.job_id, function (answer) {
                 console.log("Callbackhell answer:", answer);
                 callback(answer);
             });
-        }, 3000);
+        }, 2000);
     });
 }
 
