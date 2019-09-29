@@ -1,73 +1,103 @@
-'use strict';
-import React, { PureComponent } from 'react';
-import { AppRegistry, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import React from 'react';
+import {Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import * as Permissions from 'expo-permissions';
+import { Camera } from 'expo-camera';
 
-class ExampleApp extends PureComponent {
-    render() {
+export default class CameraExample extends React.Component {
+    state = {
+        hasCameraPermission: null,
+        type: Camera.Constants.Type.back,
+        isCapturing: false,
+        accessCameraLabel: 'Start',
+        capturedPhoto: null
+    };
+
+    async componentDidMount() {
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({ hasCameraPermission: status === 'granted' });
+    }
+
+    async accessCamera()
+    {
+        if (this.state.isCapturing)
+        {
+            let photo = await this.camera.takePictureAsync();
+            this.setState({ isCapturing: false, accessCameraLabel: 'Retake', capturedPhoto: photo.uri});
+            console.log(photo.uri);
+        }
+        else
+        {
+            this.setState({ isCapturing: true, accessCameraLabel: 'Capture', capturedPhoto: null});
+        }
+    }
+
+    renderImage() {
         return (
-            <View style={styles.container}>
-                <RNCamera
-                    ref={ref => {
-                        this.camera = ref;
-                    }}
-                    style={styles.preview}
-                    type={RNCamera.Constants.Type.back}
-                    flashMode={RNCamera.Constants.FlashMode.on}
-                    androidCameraPermissionOptions={{
-                        title: 'Permission to use camera',
-                        message: 'We need your permission to use your camera',
-                        buttonPositive: 'Ok',
-                        buttonNegative: 'Cancel',
-                    }}
-                    androidRecordAudioPermissionOptions={{
-                        title: 'Permission to use audio recording',
-                        message: 'We need your permission to use your audio',
-                        buttonPositive: 'Ok',
-                        buttonNegative: 'Cancel',
-                    }}
-                    onGoogleVisionBarcodesDetected={({ barcodes }) => {
-                        console.log(barcodes);
-                    }}
+            <View style={{flex: 1}}>
+                <Image
+                    style={{ flex: 1, alignItems: 'stretch', flexDirection: 'row'}}
+                    source={{ uri: this.state.capturedPhoto }}
                 />
-                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={this.takePicture.bind(this)} style={styles.capture}>
-                        <Text style={{ fontSize: 14 }}> SNAP </Text>
-                    </TouchableOpacity>
-                </View>
+                <Text
+                    style={{width: 50, height: 50}}
+                    onPress={() => this.setState({ capturedPhoto: null })}
+                >Retake
+                </Text>
             </View>
         );
     }
 
-    takePicture = async() => {
-        if (this.camera) {
-            const options = { quality: 0.5, base64: true };
-            const data = await this.camera.takePictureAsync(options);
-            console.log(data.uri);
+    renderCamera() {
+        return (
+            <View style={{ flex: 1 }}>
+                <Camera style={{ flex: 1 }} type={this.state.type} ref={ (ref) => {this.camera = ref} }>
+                    <View
+                        style={{
+                            flex: 1,
+                            backgroundColor: 'transparent',
+                            flexDirection: 'row',
+                        }}>
+                        <TouchableOpacity
+                            style={{
+                                flex: 0.1,
+                                alignSelf: 'flex-end',
+                                alignItems: 'center',
+                            }}
+                            onPress={() => {
+                                this.setState({
+                                    type:
+                                        this.state.type === Camera.Constants.Type.back
+                                            ? Camera.Constants.Type.front
+                                            : Camera.Constants.Type.back,
+                                });
+                            }}>
+                            <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={this.accessCamera.bind(this)}>
+                            <Text style={{ fontSize: 18, marginLeft: 10, marginBottom: 10, color: 'white' }} >{this.state.accessCameraLabel}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Camera>
+            </View>
+        );
+    }
+
+    render() {
+        const { hasCameraPermission } = this.state;
+        if (hasCameraPermission === null) {
+            return <View />;
+        } else if (hasCameraPermission === false) {
+            return <Text>No access to camera</Text>;
+        } else if (this.state.capturedPhoto) {
+            return (this.renderImage());
+        } else {
+            return (this.renderCamera());
         }
-    };
+    }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'column',
-        backgroundColor: 'black',
-    },
-    preview: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    capture: {
-        flex: 0,
-        backgroundColor: '#fff',
-        borderRadius: 5,
-        padding: 15,
-        paddingHorizontal: 20,
-        alignSelf: 'center',
-        margin: 20,
-    },
+
 });
 
-AppRegistry.registerComponent('App', () => ExampleApp);

@@ -27,10 +27,12 @@
     "react-native-camera": "git+https://git@github.com/react-native-community/react-native-camera.git",
     "react-native-gesture-handler": "~1.3.0",
     "react-native-web": "^0.11.7",
-    "react-navigation": "^3.12.0"
+    "react-navigation": "^3.12.0",
+    "expo-permissions": "latest"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0",
+    "expo-camera": "^7.0.0",
     "jest-expo": "^35.0.0"
   },
   "private": true
