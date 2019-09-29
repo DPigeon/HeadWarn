@@ -1,9 +1,10 @@
 var fs = require("fs");
+const database = require('./data.json');
 var request = require("request");
 const { comparePics } = require("./config/compare");
 let PICTURE = "person.png"
 let file = fs.createReadStream(`${PICTURE}`);
-let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzI5MTY3LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjE5NjcsImp0aSI6IjNiYjkxMDZkMTc4MDEwZDg4ZDZmYzQ5NTQ3MGM3MGY2MTNhMDhjZDc4Njk3NjA3ZTBmMmZhODY3Mjc1YzMxNzgiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.8Bk0wJWoatatDTAFcsXs0wwSR65l5sukqv3KQwbeIWc'
+let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzM2NDM4LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjkyMzgsImp0aSI6ImVhOWM3NDM5YWMxNjkxZTc2Zjk3YWY3NjljZDU4MmIwODAzMTk1NmQyMWVjM2M5ZjViMGIxOTQyMmI5NjU1NTYiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.TBdrw67RnEFyjl5iwMrki5U3CIKaV8qifhmXVy-z2Oo'
 
 var jobRequest = {
     method: 'POST',
@@ -22,7 +23,7 @@ var jobRequest = {
     }
 };
 
-function getJob(jobID) {
+function getJob(jobID, callback) {
     var jobResponse = {
         method: 'GET',
         url: `https://api.wrnch.ai/v1/jobs/${jobID}`,
@@ -38,7 +39,11 @@ function getJob(jobID) {
         /****************** We will edit the joints ********/
         let joints = jsonBody.frames[0].persons[0].pose2d.joints;
         console.log("This is the joints: ",joints);
-        cleanArray(joints);
+        if(joints.length < 20){
+            callback(response(0));
+        }else{
+            callback(cleanArray(joints));
+        }
     });
 }
 
@@ -52,7 +57,7 @@ function cleanArray(joints){
     }, finalJoints); // use arr as this
     console.log("Final values: ", finalJoints);
     /***************Main Logic*********************************/
-    analyzer(finalJoints);
+    return analyzer(finalJoints);
     /***************Main Logic*********************************/
 }
 
@@ -69,24 +74,51 @@ function analyzer(joints){
   let rightEar = [joints[18], joints[19]];
 
     if (leftEye[1] < comparePics && rightEye[1] < comparePics) { 
-        console.log("Tired");
-        return 0;
+        return response(0);
     }  
   if (leftEye[1] >= comparePics && rightEye[1] >= comparePics) {
-      console.log("Awake");
-      return 1;
+      return response(1);
   }
 }
 
+function response(id) {
+    let TIRED = 0;
+    let AWAKE = 1;
+
+    if (id === TIRED) {
+        console.log("Tired");
+        return TIRED;
+    } else {
+        console.log("Awakes");
+        return AWAKE;
+    }
+}
+
+
 /****************** Main function  ********/
-request(jobRequest, function (error, response, body) {
-    if (error) throw new Error(error);
-    let jsonBody = JSON.parse(body);
-    console.log("Job Id",jsonBody.job_id);
-    console.log('ZZZzzZzzzzZZZZz for 5 seconds');
-    setTimeout(function () {
-        getJob(jsonBody.job_id);
-        }, 5000);
-});
-    
+function process(callback){
+    request(jobRequest, function (error, response, body) {
+        if (error) throw new Error(error);
+        let jsonBody = JSON.parse(body);
+        console.log("Job Id", jsonBody.job_id);
+        console.log('ZZZzzZzzzzZZZZz for 5 seconds');
+        setTimeout(function () {
+            getJob(jsonBody.job_id, function (answer) {
+                console.log("Callbackhell answer:", answer);
+                callback(answer);
+            });
+        }, 3000);
+    });
+}
+
+ function main(){
+    let response = process(function(answer){
+        console.log("final answer", answer);
+    });
+}
+
+main();
+/****************** Main function  ********/
+
+
 
