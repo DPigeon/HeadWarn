@@ -3,8 +3,9 @@ var request = require("request");
 const { comparePics } = require("./config/compare");
 let PICTURE = "person.png";
 let file = fs.createReadStream(`./${PICTURE}`);
+let { readJSON } = require("./config/compare");
 let TOKEN =
-  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzI5MTY3LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjE5NjcsImp0aSI6IjNiYjkxMDZkMTc4MDEwZDg4ZDZmYzQ5NTQ3MGM3MGY2MTNhMDhjZDc4Njk3NjA3ZTBmMmZhODY3Mjc1YzMxNzgiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.8Bk0wJWoatatDTAFcsXs0wwSR65l5sukqv3KQwbeIWc";
+  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzM2NDM4LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjkyMzgsImp0aSI6ImVhOWM3NDM5YWMxNjkxZTc2Zjk3YWY3NjljZDU4MmIwODAzMTk1NmQyMWVjM2M5ZjViMGIxOTQyMmI5NjU1NTYiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.TBdrw67RnEFyjl5iwMrki5U3CIKaV8qifhmXVy-z2Oo";
 
 var jobRequest = {
   method: "POST",
@@ -38,6 +39,7 @@ function getJob(jobID) {
     let joints = jsonBody.frames[0].persons[0].pose2d.joints;
     console.log("This is the joints: ", joints);
     cleanArray(joints);
+    //readJSON(1);
   });
 }
 
