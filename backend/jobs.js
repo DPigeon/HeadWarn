@@ -2,7 +2,7 @@ var fs = require("fs");
 var request = require("request");
 const { comparePics } = require("./config/compare");
 let PICTURE = "person.png"
-let file = fs.createReadStream(`/Users/eglenceo/Desktop/ImplementAI/ImplementAI-2019/backend/${PICTURE}`);
+let file = fs.createReadStream(`${PICTURE}`);
 let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzI5MTY3LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjE5NjcsImp0aSI6IjNiYjkxMDZkMTc4MDEwZDg4ZDZmYzQ5NTQ3MGM3MGY2MTNhMDhjZDc4Njk3NjA3ZTBmMmZhODY3Mjc1YzMxNzgiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.8Bk0wJWoatatDTAFcsXs0wwSR65l5sukqv3KQwbeIWc'
 
 var jobRequest = {
