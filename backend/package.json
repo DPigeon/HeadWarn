@@ -19,6 +19,7 @@
   "homepage": "https://github.com/DPigeon/ImplementAI-2019#readme",
   "dependencies": {
     "express": "4.17.1",
+    "formidable": "1.2.1",
     "request": "2.88.0"
   }
 }

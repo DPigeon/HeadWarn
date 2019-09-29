@@ -1,26 +1,24 @@
 var fs = require("fs");
-const database = require('./data.json');
 var request = require("request");
-const { comparePics } = require("./config/compare");
+const { readJSON, overwriteJSON } = require("./config/compare");
 let PICTURE = "person.png"
 let file = fs.createReadStream(`${PICTURE}`);
-let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzM2NDM4LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MjkyMzgsImp0aSI6ImVhOWM3NDM5YWMxNjkxZTc2Zjk3YWY3NjljZDU4MmIwODAzMTk1NmQyMWVjM2M5ZjViMGIxOTQyMmI5NjU1NTYiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.TBdrw67RnEFyjl5iwMrki5U3CIKaV8qifhmXVy-z2Oo'
+let TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjQ3OCwiYWRkb25zIjp7fSwiZXhwIjoxNTY5NzQ1Mjc0LCJpZGVudGl0eSI6NDc4LCJpYXQiOjE1Njk3MzgwNzQsImp0aSI6ImI5NGY2NmFlNmVjOWNhYjQ3MDg2YmNjNTAxZjA5OWM5NzI5NTRiN2I2M2Y5YWI3NDM0MjU3Y2E0ZTFhOTQ3M2IiLCJ0eXBlIjoiYWNjZXNzIiwiZnJlc2giOiJmYWYifQ.oKSGwn0-PS4E1d487L8B76y8anx0LfSgMrDD6pbeFo0'
 
 var jobRequest = {
-    method: 'POST',
-    url: 'https://api.wrnch.ai/v1/jobs',
-    headers:
-    {
-        'Content-Type': 'multipart/form-data; boundary=--------------------------780487085191623441098948',
-        Authorization: TOKEN,
-    },
-    formData:
-    {
-        work_type: 'json',
-        heads: 'true',
-        est_3d: 'true',
-        media: file
-    }
+  method: "POST",
+  url: "https://api.wrnch.ai/v1/jobs",
+  headers: {
+    "Content-Type":
+      "multipart/form-data; boundary=--------------------------780487085191623441098948",
+    Authorization: TOKEN
+  },
+  formData: {
+    work_type: "json",
+    heads: "true",
+    est_3d: "true",
+    media: file
+  }
 };
 
 function getJob(jobID, callback) {
@@ -57,12 +55,14 @@ function cleanArray(joints){
     }, finalJoints); // use arr as this
     console.log("Final values: ", finalJoints);
     /***************Main Logic*********************************/
-    return analyzer(finalJoints);
+    let data = analyzer(finalJoints)
+    console.log("analyzer", )
+    return data;
     /***************Main Logic*********************************/
 }
 
-function analyzer(joints){
-    let topMouth = [joints[0], joints[1]];
+function analyzer(joints) {
+  let topMouth = [joints[0], joints[1]];
   let chin = [joints[2], joints[3]];
   let middleOfEyes = [joints[4], joints[5]];
   let leftShoulder = [joints[6], joints[7]];
@@ -73,10 +73,12 @@ function analyzer(joints){
   let rightEye = [joints[16], joints[17]];
   let rightEar = [joints[18], joints[19]];
 
-    if (leftEye[1] < comparePics && rightEye[1] < comparePics) { 
+    if (leftEye[1] < readJSON(1)) { 
+        overwriteJSON(joints);
         return response(0);
     }  
-  if (leftEye[1] >= comparePics && rightEye[1] >= comparePics) {
+    else if (leftEye[1] >= readJSON(1)) {
+       overwriteJSON(joints);
       return response(1);
   }
 }
@@ -92,6 +94,7 @@ function response(id) {
         console.log("Awakes");
         return AWAKE;
     }
+    //overwriteJSON();
 }
 
 
@@ -111,13 +114,13 @@ function process(callback){
     });
 }
 
- function main(){
-    let response = process(function(answer){
-        console.log("final answer", answer);
-    });
-}
+//  function main(){
+//     process(function(answer){
+//         console.log("final answer", answer);
+//     });
+// }
 
-main();
+module.exports = { process };
 /****************** Main function  ********/
 
 
