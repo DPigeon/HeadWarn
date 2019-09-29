@@ -72,8 +72,11 @@ export default class CameraExample extends React.Component {
   }
 
   alertMessage(output) {
-    if (output === 0) message = "awake";
-    else message = "tired";
+    if (output === 0) {
+      message = "awake";
+    } else {
+      message = "tired";
+    }
     return (
       <View>
         <Alert>You are {message}.</Alert>
